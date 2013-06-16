@@ -16,13 +16,13 @@ describe HashSpidey::Strategies::HashStore do
 		end
 
 	end
-	
+
 	context 'generic #handle' do 
 
 		before(:each) do 
 			FakeWeb.register_uri(:get, "http://www.example.com/", :body => "Hello World", code: 200,
 				"content-type"=>"text/html; charset=UTF-8"
-			)
+				)
 			@spider = TestSpider.new request_interval: 0
 			@spider.handle "http://www.example.com/", :process_size
 			@spider.crawl 
@@ -36,21 +36,20 @@ describe HashSpidey::Strategies::HashStore do
 
 			it 'should update #crawled_timestamp' do 
 				@crawled_url = @spider.crawls.values.first 
-	  			expect( @crawled_url.url ).to eq 'http://www.example.com/'
-	  		 	expect( @crawled_url.crawled_timestamp > @crawled_url.initialized_timestamp).to be_true
+				expect( @crawled_url.url ).to eq 'http://www.example.com/'
+				expect( @crawled_url.crawled_timestamp > @crawled_url.initialized_timestamp).to be_true
 			end
 
 			it 'should have #crawls act as a Hash' do 
 				expect( @spider.crawls['http://www.example.com/'].url).to eq 'http://www.example.com/'
 			end
- 
-			it "should not add duplicate URLs" do
-		    @spider.handle "http://www.example.com/", :process_something_else # second time			    
-		    expect( @spider.crawls.count ).to eq 1
-			end
-		
-			context '@crawl_record' do 
 
+			it "should not add duplicate URLs" do
+				@spider.handle "http://www.example.com/", :process_something_else # second time			    
+				expect( @spider.crawls.count ).to eq 1
+			end
+
+			context '@crawl_record' do 
 				before(:each) do 
 					@crawled_url = @spider.crawls["http://www.example.com/"]
 				end
@@ -60,13 +59,10 @@ describe HashSpidey::Strategies::HashStore do
 				end
 
 				it 'should respond to header#content-type' do 
-					expect(@crawled_url.header['content-type']).to eq "text/html; charset=UTF-8"
+					expect(@crawled_url.crawleheader['content-type']).to eq "text/html; charset=UTF-8"
 				end
 			end
 		end
-
-
-
 	end
 
 
@@ -91,8 +87,4 @@ describe HashSpidey::Strategies::HashStore do
 			end
 		end	
 	end
-
-  
-  
-
 end
