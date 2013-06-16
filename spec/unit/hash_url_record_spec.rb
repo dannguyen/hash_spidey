@@ -37,9 +37,9 @@ describe HashSpidey::HashUrlRecord do
 			@hurl = HashUrlRecord.new "http://www.example.com"
 		end
 
-		describe '#record_content' do 
+		describe '#mark_record' do 
 			before(:each) do 
-				@hurl.record_content 'hello'
+				@hurl.mark_record content: 'hello'
 			end
 
 			it 'should set @recorded_timestamp' do 

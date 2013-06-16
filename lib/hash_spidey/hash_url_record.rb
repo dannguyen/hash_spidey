@@ -7,7 +7,7 @@ module HashSpidey
 		attr_reader :url, :code,  
 			:initialized_timestamp, :crawled_timestamp, :recorded_timestamp,
 			:content, :handler, :spider, :handle_data,
-			:crawl_metadata
+			:crawl_metadata, :parsed_data
 
 
 		# convenience name for spidey
@@ -31,8 +31,11 @@ module HashSpidey
 		end
 
 
-		def record_content(ct)
-			@content = ct 
+		def mark_record(obj)
+			obj = Hashie::Mash.new(obj) if obj.is_a?(Hash)
+
+			@content = obj.content if obj.respond_to?(:content)
+			@parsed_data = obj.parsed_data if obj.respond_to?(:parsed_data)
 			@recorded_timestamp = Time.now
 		end
 
@@ -51,6 +54,9 @@ module HashSpidey
 			!(crawled_timestamp.nil?)
 		end
 
+		def has_content?
+			!(@content.nil? || @content.empty?)
+		end
 
 		## this is just an alias
 

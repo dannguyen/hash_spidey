@@ -59,20 +59,23 @@ describe HashSpidey::Strategies::HashStore do
 				end
 
 				it 'should respond to header#content-type' do 
-					expect(@crawled_url.crawleheader['content-type']).to eq "text/html; charset=UTF-8"
+					expect(@crawled_url.header['content-type']).to eq "text/html; charset=UTF-8"
 				end
 			end
 		end
 	end
 
 
-	context 'generic #record' do 
+	context 'generic #record_page' do 
 		describe '#records' do 
 			before(:each) do 
+				FakeWeb.register_uri(:get, "http://www.example.com/", :body => "Hello World", code: 200,
+				"content-type"=>"text/html; charset=UTF-8"
+				)
 
-				@data = Hashie::Mash.new url: 'http://www.example.com/', content: 'Hello World'
 				@spider = TestSpider.new request_interval: 0
-				@spider.record @data
+				@page = Mechanize.new.get("http://www.example.com/")
+				@spider.record_page @page
 			end		
 
 			it "should add to records" do 
@@ -81,7 +84,9 @@ describe HashSpidey::Strategies::HashStore do
 			end
 
 			it 'should update existing result' do 
-				@spider.record Hashie::Mash.new url: 'http://www.example.com/', content: 'Bye World'
+				@page.stub(:content){ 'Bye World' }
+
+				@spider.record_page @page
 				expect(@spider.records['http://www.example.com/'].content).to eq 'Bye World'
 				expect(@spider.records.count).to eq 1
 			end

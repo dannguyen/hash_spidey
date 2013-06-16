@@ -5,6 +5,7 @@ module HashSpidey
 			def initialize(attrs = {})
 				@url_collection = {}
 				@error_collection = []
+				agent.user_agent = "Abstract Spider"
 
 				super(attrs)
 			end
@@ -42,8 +43,8 @@ module HashSpidey
 					begin
 						page = agent.get(url)
 						Spidey.logger.info "Handling #{url.inspect}"
-						process_crawl(url, page)
 						send handler, page, default_data
+						process_crawl(url, page)
 					rescue => ex
 						add_error url: url, handler: handler, error: ex
 					end
@@ -61,26 +62,29 @@ module HashSpidey
 			end
 
 			# expects @url_collection to have :url, but if not, creates new HashUrlRecord  
-			def record(data_hashie)
-				url = data_hashie.url
+			# data_hashie should have :content and/or :parsed_data
+			def record(url, data_hashie)
 				h_url = @url_collection[url] || HashUrlRecord.new(url)
 
 				# set the content and record_timestamp of the HashUrlRecord
-				h_url.record_content(data_hashie.content)
+				h_url.mark_record(data_hashie)
 
 				# reassign, update collection
 				@url_collection[url] = h_url
 			end
 
-
-			# wrapper around #record 
-			def record_page(page, default_data={})
-				msh = Hashie::Mash.new(default_data)
-				msh.url = page.uri.to_s
-				msh.content = page.content
-
-				record(msh) 
+			# convenience method, expecting :page to be a Nokogiri::Page
+			def record_page(page)
+				url = page.uri.to_s
+				record(url, content: page.content)
 			end
+
+			def record_data(page, data)
+				url = page.uri.to_s
+				record(url, parsed_data: data)
+			end
+
+			
 
 			def each_url(&block)
 				while h_url = get_next_url_hash

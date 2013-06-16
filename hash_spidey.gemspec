@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.version       = HashSpidey::VERSION
   spec.authors       = ["dannguyen"]
   spec.email         = ["dansonguyen@gmail.com"]
-  spec.description   = %q{An implementation of joeyAghion's Spidey class at Artsy}
+  spec.description   = %q{An implementation of Artsy's joeyAghion's Spidey::AbstractSpider}
   spec.summary       = %q{Uses a Hash object to store crawling process, which it can then dump to an external store}
   spec.homepage      = "http://github.com/dannguyen"
   spec.license       = "MIT"
