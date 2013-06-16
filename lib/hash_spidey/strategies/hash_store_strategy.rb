@@ -29,6 +29,8 @@ module HashSpidey
 
 			def process_crawl(url, page)
 				h_url = @url_collection[url]
+
+				# sets metadata here
 				h_url.mark_as_crawled(page)
 			end
 
